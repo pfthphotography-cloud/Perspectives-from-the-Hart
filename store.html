@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PFTH Store</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero hero-small">
+    <div class="wrap">
+      <p class="eyebrow">PFTH Store</p>
+      <h1>Available Works</h1>
+      <p class="sub">Curated release from the current 50-image drop.</p>
+      <div class="hero-actions">
+        <a class="btn btn-secondary" href="index.html">Back Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="toolbar">
+      <input id="search" type="text" placeholder="Search image name...">
+      <span id="count"></span>
+    </section>
+
+    <section id="gallery" class="gallery-grid"></section>
+  </main>
+
+  <script>
+    let allItems = [];
+
+    function render(items) {
+      const gallery = document.getElementById('gallery');
+      const count = document.getElementById('count');
+      count.textContent = `${items.length} image${items.length === 1 ? '' : 's'}`;
+
+      if (!items.length) {
+        gallery.innerHTML = '<p class="empty">No images found.</p>';
+        return;
+      }
+
+      gallery.innerHTML = items.map(item => `
+        <article class="card">
+          <img src="assets/store/${encodeURIComponent(item.file)}" alt="${item.id}" loading="lazy">
+          <div class="card-body">
+            <h3>${item.id}</h3>
+            <p class="price">$295 License Preview</p>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    async function loadStore() {
+      try {
+        const res = await fetch('assets/store/manifest.json');
+        if (!res.ok) throw new Error('manifest load failed');
+        allItems = await res.json();
+        render(allItems);
+      } catch (err) {
+        document.getElementById('gallery').innerHTML =
+          '<p class="empty">Unable to load store manifest.</p>';
+      }
+    }
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      const filtered = allItems.filter(item => item.id.toLowerCase().includes(q));
+      render(filtered);
+    });
+
+    loadStore();
+  </script>
+</body>
+</html>

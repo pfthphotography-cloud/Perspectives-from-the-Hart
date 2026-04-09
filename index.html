@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PFTH Photography</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">PFTH Photography</p>
+      <h1>Perspectives From The Hart</h1>
+      <p class="sub">Fine art, commercial, and collectible photography.</p>
+      <div class="hero-actions">
+        <a class="btn" href="store.html">Enter Store</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="intro-card">
+      <h2>Featured Collection</h2>
+      <p>Browse a curated release from the PFTH archive.</p>
+      <div id="featured-grid" class="gallery-grid"></div>
+    </section>
+  </main>
+
+  <script>
+    async function loadFeatured() {
+      const grid = document.getElementById('featured-grid');
+      try {
+        const res = await fetch('assets/store/manifest.json');
+        if (!res.ok) throw new Error('manifest load failed');
+        const items = await res.json();
+        const featured = items.slice(0, 8);
+
+        grid.innerHTML = featured.map(item => `
+          <a class="card" href="store.html">
+            <img src="assets/store/${encodeURIComponent(item.file)}" alt="${item.id}">
+            <div class="card-body">
+              <h3>${item.id}</h3>
+              <p>View in store</p>
+            </div>
+          </a>
+        `).join('');
+      } catch (err) {
+        grid.innerHTML = '<p class="empty">Unable to load featured images.</p>';
+      }
+    }
+    loadFeatured();
+  </script>
+</body>
+</html>
